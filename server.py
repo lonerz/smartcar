@@ -65,13 +65,17 @@ class Vehicle_Doors(Resource):
     return {'id': id}
 
   def parse_response(data):
-    doors = data.get('doors').get('values')
-    json = []
+    values = data.get('doors').get('values')
+    doors = {}
 
-    for door in doors:
+    for door in values:
+      doors[door.get('location').get('value')] = door.get('locked').get('value') == 'True'
+
+    json = []
+    for location in ['frontLeft', 'frontRight', 'backLeft', 'backRight']:
       json.append({
-        'location': door.get('location').get('value'),
-        'locked': door.get('locked').get('value') == 'True',
+        'location': location,
+        'locked': doors[location],
       })
 
     return json
@@ -121,9 +125,9 @@ class Vehicle_Battery(Resource):
     return json
 
   def get(self, id):
-    payload = GM_Api.post(self.URL, Vehicle_Fuel.body(id))
+    payload = GM_Api.post(self.URL, Vehicle_Battery.body(id))
     data = payload.get('data')
-    return Vehicle_Fuel.parse_response(data)
+    return Vehicle_Battery.parse_response(data)
 
 class Vehicle_Engine(Resource):
   URL = '/actionEngineService'
