@@ -74,6 +74,9 @@ class Vehicle_Doors(Resource):
 
     json = []
     for location in ['frontLeft', 'frontRight', 'backLeft', 'backRight']:
+      if location not in doors:
+        continue
+
       json.append({
         'location': location,
         'locked': doors[location],
