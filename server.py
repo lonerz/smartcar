@@ -1,9 +1,13 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from gm_api import GM_Api
 
 app = Flask(__name__)
 api = Api(app)
+
+# add request parser for post requests
+parser = reqparse.RequestParser()
+parser.add_argument('action', required=True, help='Need an action')
 
 class Vehicle_Name(Resource):
   URL = '/getVehicleInfoService'
@@ -122,8 +126,30 @@ class Vehicle_Battery(Resource):
     return Vehicle_Fuel.parse_response(data)
 
 class Vehicle_Engine(Resource):
+  URL = '/actionEngineService'
+
+  '''
+  {
+    "status": "success|error"
+  }
+  '''
+
+  def body(id, action):
+    return ({
+      'id': id,
+      'command': 'START_VEHICLE' if action == 'START' else 'STOP_VEHICLE',
+    })
+
+  def parse_response(data):
+    json = {}
+    json['status'] = 'success' if data.get('status') == 'EXECUTED' else 'error'
+    return json
+
   def post(self, id):
-    return {}
+    args = parser.parse_args()
+    payload = GM_Api.post(self.URL, Vehicle_Engine.body(id, args.get('action')))
+    data = payload.get('actionResult')
+    return Vehicle_Engine.parse_response(data)
 
 api.add_resource(Vehicle_Name, '/vehicles/<id>')
 api.add_resource(Vehicle_Doors, '/vehicles/<id>/doors')
