@@ -1,12 +1,37 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
+from gm_api import GM_Api
 
 app = Flask(__name__)
 api = Api(app)
 
 class Vehicle_Name(Resource):
+  URL = '/getVehicleInfoService'
+
+  '''
+  {
+    "vin": "1213231",
+    "color": "Metallic Silver",
+    "doorCount": 4,
+    "driveTrain": "v8"
+  }
+  '''
+
+  def body(id):
+    return {'id': id}
+
+  def parse_response(data):
+    json = {}
+    json['vin'] = data.get('vin').get('value')
+    json['color'] = data.get('color').get('value')
+    json['doorCount'] = 4 if data.get('fourDoorSedan').get('value') == 'True' else 2
+    json['driveTrain'] = data.get('driveTrain').get('value')
+    return json
+
   def get(self, id):
-    return {}
+    payload = GM_Api.post(self.URL, Vehicle_Name.body(id))
+    data = payload.get('data')
+    return Vehicle_Name.parse_response(data)
 
 class Vehicle_Doors(Resource):
   def get(self, id):
