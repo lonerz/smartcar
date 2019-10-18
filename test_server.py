@@ -137,15 +137,15 @@ def test_vehicle_battery(client, mocker):
         'value': '15.2'
       },
       'batteryLevel': {
-        'type': 'Number',
-        'value': '50.3'
+        'type': 'Null',
+        'value': 'null'
       }
     }
   }
 
   resp = client.get('/vehicles/1234/battery')
   mock.assert_called_with('/getEnergyService', {'id': '1234'})
-  assert(resp.json == {'percent': 50.3})
+  assert(resp.json == {'percent': None})
 
 def test_vehicle_engine(client, mocker):
   mock = mocker.patch('gm_api.GM_Api.post')
@@ -160,3 +160,15 @@ def test_vehicle_engine(client, mocker):
   resp = client.post('/vehicles/1234/engine', json={'action': 'START'})
   mock.assert_called_with('/actionEngineService', {'id': '1234', 'command': 'START_VEHICLE'})
   assert(resp.json == {'status': 'success'})
+
+  mock.return_value = {
+    'service': 'actionEngine',
+    'status': '200',
+    'actionResult': {
+      'status': 'FAILED'
+    }
+  }
+
+  resp = client.post('/vehicles/1234/engine', json={'action': 'STOP'})
+  mock.assert_called_with('/actionEngineService', {'id': '1234', 'command': 'STOP_VEHICLE'})
+  assert(resp.json == {'status': 'error'})
