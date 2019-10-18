@@ -172,3 +172,11 @@ def test_vehicle_engine(client, mocker):
   resp = client.post('/vehicles/1234/engine', json={'action': 'STOP'})
   mock.assert_called_with('/actionEngineService', {'id': '1234', 'command': 'STOP_VEHICLE'})
   assert(resp.json == {'status': 'error'})
+
+def test_errors(client, mocker):
+  mock = mocker.patch('gm_api.GM_Api.post')
+  mock.return_value = {'error': 'Vehicle id: 1000 not found.'}
+
+  resp = client.get('/vehicles/1000')
+  mock.assert_called_with('/getVehicleInfoService', {'id': '1000'})
+  assert(resp.json == {'error': 'Vehicle id: 1000 not found.'})

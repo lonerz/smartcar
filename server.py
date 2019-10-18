@@ -35,8 +35,10 @@ class Vehicle_Name(Resource):
 
   def get(self, id):
     payload = GM_Api.post(self.URL, Vehicle_Name.body(id))
-    data = payload.get('data')
-    return Vehicle_Name.parse_response(data)
+
+    if payload.get('error'):
+      return payload
+    return Vehicle_Name.parse_response(payload.get('data'))
 
 class Vehicle_Doors(Resource):
   URL = '/getSecurityStatusService'
@@ -86,8 +88,10 @@ class Vehicle_Doors(Resource):
 
   def get(self, id):
     payload = GM_Api.post(self.URL, Vehicle_Doors.body(id))
-    data = payload.get('data')
-    return Vehicle_Doors.parse_response(data)
+
+    if payload.get('error'):
+      return payload
+    return Vehicle_Doors.parse_response(payload.get('data'))
 
 class Vehicle_Fuel(Resource):
   URL = '/getEnergyService'
@@ -108,8 +112,10 @@ class Vehicle_Fuel(Resource):
 
   def get(self, id):
     payload = GM_Api.post(self.URL, Vehicle_Fuel.body(id))
-    data = payload.get('data')
-    return Vehicle_Fuel.parse_response(data)
+
+    if payload.get('error'):
+      return payload
+    return Vehicle_Fuel.parse_response(payload.get('data'))
 
 class Vehicle_Battery(Resource):
   URL = '/getEnergyService'
@@ -130,8 +136,10 @@ class Vehicle_Battery(Resource):
 
   def get(self, id):
     payload = GM_Api.post(self.URL, Vehicle_Battery.body(id))
-    data = payload.get('data')
-    return Vehicle_Battery.parse_response(data)
+
+    if payload.get('error'):
+      return payload
+    return Vehicle_Battery.parse_response(payload.get('data'))
 
 class Vehicle_Engine(Resource):
   URL = '/actionEngineService'
@@ -156,8 +164,10 @@ class Vehicle_Engine(Resource):
   def post(self, id):
     args = parser.parse_args()
     payload = GM_Api.post(self.URL, Vehicle_Engine.body(id, args.get('action')))
-    data = payload.get('actionResult')
-    return Vehicle_Engine.parse_response(data)
+
+    if payload.get('error'):
+      return payload
+    return Vehicle_Engine.parse_response(payload.get('actionResult'))
 
 api.add_resource(Vehicle_Name, '/vehicles/<id>')
 api.add_resource(Vehicle_Doors, '/vehicles/<id>/doors')
