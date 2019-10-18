@@ -14,6 +14,10 @@ class GM_Api:
     )
     json = resp.json()
 
-    # deal with error handling later
+    print(json)
+
+    # handle errors
+    if json.get('status') != '200':
+      return {'error': json.get('reason')}
 
     return json
