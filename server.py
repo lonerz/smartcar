@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from gm_api import GM_Api
+from utils import get_value
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,10 +27,10 @@ class Vehicle_Name(Resource):
 
   def parse_response(data):
     json = {}
-    json['vin'] = data.get('vin').get('value')
-    json['color'] = data.get('color').get('value')
-    json['doorCount'] = 4 if data.get('fourDoorSedan').get('value') == 'True' else 2
-    json['driveTrain'] = data.get('driveTrain').get('value')
+    json['vin'] = get_value(data, 'vin')
+    json['color'] = get_value(data, 'color')
+    json['doorCount'] = 4 if get_value(data, 'fourDoorSedan') else 2
+    json['driveTrain'] = get_value(data, 'driveTrain')
     return json
 
   def get(self, id):
@@ -69,7 +70,7 @@ class Vehicle_Doors(Resource):
     doors = {}
 
     for door in values:
-      doors[door.get('location').get('value')] = door.get('locked').get('value') == 'True'
+      doors[get_value(door, 'location')] = get_value(door, 'locked')
 
     json = []
     for location in ['frontLeft', 'frontRight', 'backLeft', 'backRight']:
@@ -99,7 +100,7 @@ class Vehicle_Fuel(Resource):
 
   def parse_response(data):
     json = {}
-    json['percent'] = float(data.get('tankLevel').get('value'))
+    json['percent'] = get_value(data, 'tankLevel')
     return json
 
   def get(self, id):
@@ -121,7 +122,7 @@ class Vehicle_Battery(Resource):
 
   def parse_response(data):
     json = {}
-    json['percent'] = float(data.get('batteryLevel').get('value'))
+    json['percent'] = get_value(data, 'batteryLevel')
     return json
 
   def get(self, id):
