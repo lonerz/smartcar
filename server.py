@@ -100,8 +100,26 @@ class Vehicle_Fuel(Resource):
     return Vehicle_Fuel.parse_response(data)
 
 class Vehicle_Battery(Resource):
+  URL = '/getEnergyService'
+
+  '''
+  {
+    "percent": 50.3
+  }
+  '''
+
+  def body(id):
+    return {'id': id}
+
+  def parse_response(data):
+    json = {}
+    json['percent'] = float(data.get('batteryLevel').get('value'))
+    return json
+
   def get(self, id):
-    return {}
+    payload = GM_Api.post(self.URL, Vehicle_Fuel.body(id))
+    data = payload.get('data')
+    return Vehicle_Fuel.parse_response(data)
 
 class Vehicle_Engine(Resource):
   def post(self, id):
