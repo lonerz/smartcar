@@ -34,8 +34,48 @@ class Vehicle_Name(Resource):
     return Vehicle_Name.parse_response(data)
 
 class Vehicle_Doors(Resource):
+  URL = '/getSecurityStatusService'
+
+  '''
+  [
+    {
+      "location": "frontLeft",
+      "locked": true
+    },
+    {
+      "location": "frontRight",
+      "locked": true
+    },
+    {
+      "location": "backLeft",
+      "locked": true
+    },
+    {
+      "location": "backRight",
+      "locked": false
+    }
+  ]
+  '''
+
+  def body(id):
+    return {'id': id}
+
+  def parse_response(data):
+    doors = data.get('doors').get('values')
+    json = []
+
+    for door in doors:
+      json.append({
+        'location': door.get('location').get('value'),
+        'locked': door.get('locked').get('value') == 'True',
+      })
+
+    return json
+
   def get(self, id):
-    return {}
+    payload = GM_Api.post(self.URL, Vehicle_Doors.body(id))
+    data = payload.get('data')
+    return Vehicle_Doors.parse_response(data)
 
 class Vehicle_Fuel(Resource):
   def get(self, id):
